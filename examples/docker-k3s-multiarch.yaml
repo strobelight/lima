@@ -107,10 +107,6 @@ probes:
     Run "limactl shell k3s sudo journalctl -u k3s" to check the log.
     If that is still empty, check the bottom of the log at "/var/log/cloud-init-output.log".
 
-copyToHost:
-- guest: "/etc/rancher/k3s/k3s.yaml"
-  host: "{{.Dir}}/copied-from-guest/kubeconfig.yaml"
-
 hostResolver:
   # hostResolver.hosts requires lima 0.8.3 or later. Names defined here will also
   # resolve inside containers, and not just inside the VM itself.
@@ -128,6 +124,8 @@ message: |
   ------
   To run `kubectl` on the host (assumes kubectl is installed), run the following commands:
   ------
+  mkdir -p {{.Dir}}/copied-from-guest
+  limactl shell {{.Name}} sudo cat /etc/rancher/k3s/k3s.yaml > {{.Dir}}/copied-from-guest/kubeconfig.yaml
   export KUBECONFIG="{{.Dir}}/copied-from-guest/kubeconfig.yaml"
   kubectl ...
   ------
