@@ -79,6 +79,16 @@ provision:
     docker context use rootless
 - mode: system
   script: |
+    #!/bin/bash
+    mkdir -p /etc/rancher/k3s/
+    cat <<EOF > /etc/rancher/k3s/registries.yaml
+    mirrors:
+      localhost:
+        endpoint:
+          - "http://localhost:5000"
+    EOF
+- mode: system
+  script: |
     #!/bin/sh
     curl -sfL https://get.k3s.io | sh -
 

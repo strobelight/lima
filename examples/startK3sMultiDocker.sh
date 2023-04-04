@@ -34,4 +34,4 @@ docker context use lima-$INSTANCE_NAME
 
 # set up registry
 mkdir -p ~/Docker-Storage
-docker run -d --restart=always -p "127.0.0.1:5001:5000" -v ~/Docker-Storage:/var/lib/registry --name registry registry
+docker run -d --restart=always -p "127.0.0.1:5000:5000" -v ~/Docker-Storage:/var/lib/registry --name registry registry
