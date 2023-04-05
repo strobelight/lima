@@ -42,6 +42,14 @@ mounts:
   writable: true
 - location: "/tmp/lima"
   writable: true
+
+# external disk
+# limactl disk create images --size 10G
+# will be available as /mnt/lima-images
+# NOTE: I couldn't get this mount to work like I wanted... persistent images
+#additionalDisks:
+#- "images"
+
 # containerd is managed by Docker, not by Lima, so the values are set to false here.
 containerd:
   system: false
