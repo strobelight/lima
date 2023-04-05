@@ -4,8 +4,10 @@ INSTANCE_NAME=k3smulti
 YAML=~/src/lima/examples/docker-k3s-multiarch.yaml
 
 # start lima from desired yaml file
+# check for disks and create them first with limactl disk create blah --size blah
 limactl start --name $INSTANCE_NAME --tty=false $YAML
 
+echo "Performing above steps ..."
 # copy kubeconfig
 mkdir -p ~/.lima/$INSTANCE_NAME/copied-from-guest
 limactl shell $INSTANCE_NAME sudo cat /etc/rancher/k3s/k3s.yaml > ~/.lima/$INSTANCE_NAME/copied-from-guest/kubeconfig.yaml
@@ -32,6 +34,7 @@ rm -f $GUEST_CONFIG $NEW_CONFIG
 docker context create lima-$INSTANCE_NAME --docker "host=unix://${HOME}/.lima/$INSTANCE_NAME/sock/docker.sock"
 docker context use lima-$INSTANCE_NAME
 
+echo "Setting up a local registry"
 # set up registry
 DOCKER_STORAGE=$HOME/Docker-Storage
 mkdir -p $DOCKER_STORAGE
@@ -64,5 +67,11 @@ docker run -d --restart=always -p "127.0.0.1:5000:5000" \
 
 docker run -d --restart=always -p "8080:80" -e DELETE_IMAGES=true -e REGISTRY_TITLE="Localhost Registry" -e REGISTRY_URL="http://localhost:5000" -e SINGLE_REGISTRY=true --name registry-ui joxit/docker-registry-ui:latest
 
-# After delete, run
-#   docker exec registry registry garbage-collect /etc/docker/registry/config.yml
+cat <<EOF
+
+Local registry available at http://localhost:8080
+
+After delete, run
+   docker exec registry registry garbage-collect /etc/docker/registry/config.yml
+
+EOF
