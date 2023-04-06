@@ -1,10 +1,15 @@
 #!/bin/bash
 
 INSTANCE_NAME=k3smulti
-YAML=~/src/lima/examples/docker-k3s-multiarch.yaml
+YAML=./docker-k3s-multiarch.yaml
 
 # start lima from desired yaml file
 # check for disks and create them first with limactl disk create blah --size blah
+DISK_NAME=docker
+DISK_PRESENT=$(limactl disk ls 2>/dev/null| grep $DISK_NAME)
+if [ -z "$DISK_PRESENT" ]; then
+    limactl disk create $DISK_NAME --size 10G
+fi
 limactl start --name $INSTANCE_NAME --tty=false $YAML
 
 echo "Performing above steps ..."

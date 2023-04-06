@@ -44,17 +44,33 @@ mounts:
   writable: true
 
 # external disk
-# limactl disk create images --size 10G
-# will be available as /mnt/lima-images
-# NOTE: I couldn't get this mount to work like I wanted... persistent images
-#additionalDisks:
-#- "images"
+# limactl disk create docker --size 10G
+# will be available as /mnt/lima-docker
+additionalDisks:
+- docker
 
 # containerd is managed by Docker, not by Lima, so the values are set to false here.
 containerd:
   system: false
   user: false
 provision:
+- mode: system
+  # mount docker directories to external disk for persistency
+  # courtesy jandubois
+  script: |
+    #!/bin/bash
+    set -eux -o pipefail
+
+    MNT=/mnt/lima-docker
+    ROOT=/var/lib/docker
+    USER=/home/${LIMA_CIDATA_USER}.linux/.local/share/docker
+
+    mkdir -p $MNT/root $MNT/user
+    mkdir -p $ROOT $USER
+    mount --bind /$MNT/root $ROOT
+    mount --bind /$MNT/user $USER
+
+    chown -R $LIMA_CIDATA_USER:$LIMA_CIDATA_USER /home/${LIMA_CIDATA_USER}.linux/.local
 - mode: system
   # This script defines the host.docker.internal hostname when hostResolver is disabled.
   # It is also needed for lima 0.8.2 and earlier, which does not support hostResolver.hosts.
